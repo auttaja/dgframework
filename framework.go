@@ -30,7 +30,7 @@ type BotPlugin interface {
 // NewBot returns a new Bot instance
 func NewBot(token, prefix string, shardID, shardCount int, dbSession *r.Session) (*Bot, error) {
 	bot := new(Bot)
-	dg, err := discordgo.New("Bot " + token)
+	dg, err := discordgo.New(token)
 	if err != nil {
 		return nil, err
 	}
