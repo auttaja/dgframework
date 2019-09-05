@@ -59,7 +59,7 @@ func (b *Bot) LoadPlugins(location string) error {
 	for _, pluginPath := range plugins {
 		plug, err := plugin.Open(pluginPath)
 		if err != nil {
-			fmt.Println("Failed to load plugin: ", pluginPath)
+			fmt.Println("Failed to load plugin:", pluginPath, ":", err)
 		} else {
 			symPlugin, err := plug.Lookup("BotPlugin")
 			if err != nil {
@@ -67,7 +67,7 @@ func (b *Bot) LoadPlugins(location string) error {
 			} else {
 				botPlugin, ok := symPlugin.(BotPlugin)
 				if !ok {
-					fmt.Println("expected BotPlugin, got unknown type")
+					fmt.Println("expected BotPlugin, got unknown type", err)
 				} else {
 					botPlugin.Init(b)
 					fmt.Println("Loaded plugin ", botPlugin.Name())
