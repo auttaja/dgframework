@@ -37,6 +37,8 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *r.Session)
 	dg.ShardID = shardID
 	dg.ShardCount = shardCount
 	bot.Router = router.New()
+	bot.Session = dg
+	bot.DB = dbSession
 
 	return bot, nil
 }
