@@ -37,6 +37,9 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *r.Session)
 	dg.ShardID = shardID
 	dg.ShardCount = shardCount
 	bot.Router = router.New()
+	dg.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
+		bot.Router.FindAndExecute(dg, prefix, dg.State.User.ID, m.Message)
+	})
 	bot.Session = dg
 	bot.DB = dbSession
 
