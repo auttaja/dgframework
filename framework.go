@@ -10,13 +10,13 @@ import (
 	"github.com/auttaja/dgframework/router"
 	"github.com/auttaja/discordgo"
 	"github.com/casbin/casbin"
-	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	"github.com/globalsign/mgo"
 )
 
 // Bot represents a Discord bot
 type Bot struct {
 	Session  *discordgo.Session
-	DB       *r.Session
+	DB       *mgo.Session
 	Router   *router.Route
 	Enforcer *casbin.Enforcer
 }
@@ -28,7 +28,7 @@ type BotPlugin interface {
 }
 
 // NewBot returns a new Bot instance
-func NewBot(token, prefix string, shardID, shardCount int, dbSession *r.Session) (*Bot, error) {
+func NewBot(token, prefix string, shardID, shardCount int, dbSession *mgo.Session) (*Bot, error) {
 	bot := new(Bot)
 	dg, err := discordgo.New(token)
 	if err != nil {
@@ -63,20 +63,20 @@ func (b *Bot) LoadPlugins(location string) error {
 		plug, err := plugin.Open(pluginPath)
 		if err != nil {
 			fmt.Println("Failed to load plugin:", pluginPath, ":", err)
-		} else {
-			symPlugin, err := plug.Lookup("BotPlugin")
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				botPlugin, ok := symPlugin.(BotPlugin)
-				if !ok {
-					fmt.Println("expected BotPlugin, got unknown type", err)
-				} else {
-					botPlugin.Init(b)
-					fmt.Println("Loaded plugin ", botPlugin.Name())
-				}
-			}
+			continue
 		}
+		symPlugin, err := plug.Lookup("BotPlugin")
+		if err != nil {
+			fmt.Println("Unable to load BotPlugin symbol:", err)
+			continue
+		}
+		botPlugin, ok := symPlugin.(BotPlugin)
+		if !ok {
+			fmt.Println("expected BotPlugin, got unknown type:", err)
+			continue
+		}
+		botPlugin.Init(b)
+		fmt.Println("Loaded plugin ", botPlugin.Name())
 	}
 
 	return nil
