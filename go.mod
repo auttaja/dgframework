@@ -7,7 +7,7 @@ require (
 	github.com/auttaja/discordgo v0.20.8
 	github.com/casbin/casbin v1.9.1
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
-	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8 // indirect
+	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pty v1.1.8 // indirect

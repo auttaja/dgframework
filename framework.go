@@ -2,6 +2,7 @@ package dgframework
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"plugin"
@@ -40,6 +41,7 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *mgo.Sessio
 	dg.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
 		bot.Router.FindAndExecute(dg, prefix, dg.State.User.ID, m.Message)
 	})
+	dg.AddHandler(bot.ready)
 	bot.Session = dg
 	bot.DB = dbSession
 
@@ -80,4 +82,21 @@ func (b *Bot) LoadPlugins(location string) error {
 	}
 
 	return nil
+}
+
+func (b *Bot) ready(s *discordgo.Session, r *discordgo.Ready) {
+	log.Printf("%s is now ready", s.State.User.Username)
+	for _, guild := range r.Guilds {
+		if guild.Large {
+			err := s.RequestGuildMembers(guild.ID, "", 1000)
+			if err != nil {
+				fmt.Println("Error requesting guild members: ", err)
+				return
+			}
+		}
+	}
+}
+
+func (b *Bot) processGuildMembersChunk(s *discordgo.Session, c *discordgo.GuildMembersChunk) {
+	fmt.Printf("Processing %d members for %s\n", len(c.Members), c.GuildID)
 }
