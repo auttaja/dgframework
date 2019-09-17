@@ -11,13 +11,13 @@ import (
 	"github.com/auttaja/dgframework/router"
 	"github.com/auttaja/discordgo"
 	"github.com/casbin/casbin"
-	"github.com/globalsign/mgo"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // Bot represents a Discord bot
 type Bot struct {
 	Session  *discordgo.Session
-	DB       *mgo.Session
+	DB       *mongo.Client
 	Router   *router.Route
 	Enforcer *casbin.Enforcer
 }
@@ -29,7 +29,7 @@ type BotPlugin interface {
 }
 
 // NewBot returns a new Bot instance
-func NewBot(token, prefix string, shardID, shardCount int, dbSession *mgo.Session) (*Bot, error) {
+func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client) (*Bot, error) {
 	bot := new(Bot)
 	dg, err := discordgo.New(token)
 	if err != nil {
