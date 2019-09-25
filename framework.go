@@ -10,16 +10,18 @@ import (
 
 	"github.com/auttaja/dgframework/router"
 	"github.com/auttaja/discordgo"
+	"github.com/bwmarrin/snowflake"
 	"github.com/casbin/casbin"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // Bot represents a Discord bot
 type Bot struct {
-	Session  *discordgo.Session
-	DB       *mongo.Client
-	Router   *router.Route
-	Enforcer *casbin.Enforcer
+	Session       *discordgo.Session
+	DB            *mongo.Client
+	Router        *router.Route
+	Enforcer      *casbin.Enforcer
+	snowflakeNode *snowflake.Node
 }
 
 // BotPlugin represents a plugin, it must contain an Init function
@@ -31,6 +33,7 @@ type BotPlugin interface {
 // NewBot returns a new Bot instance
 func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client) (*Bot, error) {
 	bot := new(Bot)
+
 	dg, err := discordgo.New(token)
 	if err != nil {
 		return nil, err
@@ -39,11 +42,17 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Clie
 	dg.ShardCount = shardCount
 	bot.Router = router.New()
 	dg.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
-		bot.Router.FindAndExecute(dg, prefix, dg.State.User.ID, m.Message)
+		_ = bot.Router.FindAndExecute(dg, prefix, dg.State.User.ID, m.Message)
 	})
 	dg.AddHandler(bot.ready)
 	bot.Session = dg
 	bot.DB = dbSession
+
+	node, err := snowflake.NewNode(int64(shardID))
+	if err != nil {
+		return nil, err
+	}
+	bot.snowflakeNode = node
 
 	return bot, nil
 }
@@ -99,4 +108,8 @@ func (b *Bot) ready(s *discordgo.Session, r *discordgo.Ready) {
 
 func (b *Bot) processGuildMembersChunk(s *discordgo.Session, c *discordgo.GuildMembersChunk) {
 	fmt.Printf("Processing %d members for %s\n", len(c.Members), c.GuildID)
+}
+
+func (b *Bot) GenerateSnowflake() snowflake.ID {
+	return b.snowflakeNode.Generate()
 }
