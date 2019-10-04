@@ -110,6 +110,7 @@ func (b *Bot) processGuildMembersChunk(s *discordgo.Session, c *discordgo.GuildM
 	fmt.Printf("Processing %d members for %s\n", len(c.Members), c.GuildID)
 }
 
+// GenerateSnowflake generates an internal snowflake that can be used to produce unique IDs
 func (b *Bot) GenerateSnowflake() snowflake.ID {
 	return b.snowflakeNode.Generate()
 }
