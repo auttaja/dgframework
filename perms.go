@@ -13,7 +13,7 @@ type CasbinMiddleware struct {
 // Casbin performs the casbin check on the command
 func (m *CasbinMiddleware) Casbin(fn router.HandlerFunc) router.HandlerFunc {
 	return func(ctx *router.Context) {
-		guild, err := ctx.Guild(ctx.Msg.GuildID)
+		guild, err := ctx.Guild()
 		if err != nil {
 			return
 		}
