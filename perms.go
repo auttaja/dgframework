@@ -17,7 +17,7 @@ func (m *CasbinMiddleware) Casbin(fn router.HandlerFunc) router.HandlerFunc {
 		if err != nil {
 			return
 		}
-		if m.Enforce(ctx.Msg.Author.ID, ctx.Msg.GuildID, ctx.Route.Name, "execute") || guild.OwnerID == ctx.Msg.Author.ID {
+		if res := m.Enforce(ctx.Msg.Author.ID, ctx.Msg.GuildID, ctx.Route.Name, "execute"); res || guild.OwnerID == ctx.Msg.Author.ID {
 			fn(ctx)
 		} else {
 			_, _ = ctx.ReplyEmbed("You do not have permission to use this command.")
