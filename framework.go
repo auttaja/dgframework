@@ -1,12 +1,15 @@
 package dgframework
 
 import (
+	"context"
 	"fmt"
+	"github.com/auttaja/dgframework/utils"
 	"log"
 	"os"
 	"path/filepath"
 	"plugin"
 	"strings"
+	"time"
 
 	"github.com/auttaja/dgframework/router"
 	"github.com/auttaja/discordgo"
@@ -22,10 +25,88 @@ type Bot struct {
 	Enforcer *casbin.Enforcer
 }
 
+// BotBuilder is a convenience struct for making the Bot object
+type BotBuilder struct {
+	token             string
+	prefix            string
+	shardID           int
+	shardCount        int
+	pluginLocation    string
+	dbSession         *mongo.Client
+	useStatefulEmbeds bool
+}
+
 // BotPlugin represents a plugin, it must contain an Init function
 type BotPlugin interface {
 	Init(*Bot)
 	Name() string
+}
+
+// NewBotBuilder returns a new BotBuilder object with a few default values already filled in
+func NewBotBuilder(token string) *BotBuilder {
+	return &BotBuilder{
+		token:      token,
+		prefix:     "-",
+		shardCount: 1,
+	}
+}
+
+// SetPrefix sets another prefix than the default
+func (b *BotBuilder) SetPrefix(prefix string) *BotBuilder {
+	b.prefix = prefix
+	return b
+}
+
+// SetShards sets a different shard ID and shard count than the default 0 and 1 respectively
+func (b *BotBuilder) SetShards(shardID, shardCount int) *BotBuilder {
+	b.shardCount = shardCount
+	b.shardID = shardID
+	return b
+}
+
+// SetDBSession sets the DB Session in the form of a mongo.Client
+func (b *BotBuilder) SetDBSession(session *mongo.Client) *BotBuilder {
+	b.dbSession = session
+	return b
+}
+
+// UseStatefulEmbeds will make the builder also add the handlers needed for the statefulembeds from utils to work
+func (b *BotBuilder) UseStatefulEmbeds() *BotBuilder {
+	b.useStatefulEmbeds = true
+	return b
+}
+
+// SetPluginLocation sets the location with the plugins and will make the builder also load the plugins
+func (b *BotBuilder) SetPluginLocation(location string) *BotBuilder {
+	b.pluginLocation = location
+	return b
+}
+
+// Build will build the bot using the provided information in the BotBuilder
+func (b *BotBuilder) Build() (bot *Bot, err error) {
+	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession)
+	if err != nil {
+		return
+	}
+
+	if b.dbSession != nil {
+		dbContext, _ := context.WithTimeout(context.Background(), 5*time.Second)
+		err = bot.DB.Connect(dbContext)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if b.useStatefulEmbeds {
+		bot.Session.AddHandler(utils.StatefulMessageDelete)
+		bot.Session.AddHandler(utils.StatefulReactionHandler)
+	}
+
+	if b.pluginLocation != "" {
+		err = bot.LoadPlugins(b.pluginLocation)
+		return nil, err
+	}
+	return
 }
 
 // NewBot returns a new Bot instance

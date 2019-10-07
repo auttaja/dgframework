@@ -3,7 +3,7 @@ module github.com/auttaja/dgframework
 go 1.12
 
 require (
-	github.com/auttaja/discordgo v0.20.8
+	github.com/auttaja/discordgo v0.20.14
 	github.com/casbin/casbin v1.9.1
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
