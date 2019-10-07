@@ -1,21 +1,14 @@
 package router
 
 import (
-	"errors"
 	"regexp"
 	"strings"
 
 	"github.com/auttaja/discordgo"
 )
 
-// Error variables
-var (
-	ErrCouldNotFindRoute  = errors.New("Could not find route")
-	ErrRouteAlreadyExists = errors.New("route already exists")
-)
-
 // HandlerFunc is a command handler
-type HandlerFunc func(*Context)
+type HandlerFunc func(*Context) error
 
 // MiddlewareFunc is a middleware
 type MiddlewareFunc func(HandlerFunc) HandlerFunc
@@ -172,6 +165,7 @@ type Route struct {
 	Name        string
 	Aliases     []string
 	Description string
+	UsageString string
 	Category    string
 
 	// Matcher is a function that determines
@@ -194,6 +188,12 @@ type Route struct {
 // Desc sets this routes description
 func (r *Route) Desc(description string) *Route {
 	r.Description = description
+	return r
+}
+
+// Usage sets the routes usage string describing how to use the command
+func (r *Route) Usage(usage string) *Route {
+	r.UsageString = usage
 	return r
 }
 
@@ -230,7 +230,7 @@ func (r *Route) FindAndExecute(s *discordgo.Session, prefix string, botID string
 
 	// If the message content is only a bot mention and the mention route is not nil, send the mention route
 	if r.Default != nil && m.Content == mention(botID) || r.Default != nil && m.Content == nickMention(botID) {
-		r.Default.Handler(NewContext(s, m, []string{""}, r.Default))
+		_ = r.Default.Handler(NewContext(s, m, []string{""}, r.Default))
 		return nil
 	}
 
@@ -258,7 +258,11 @@ func (r *Route) FindAndExecute(s *discordgo.Session, prefix string, botID string
 
 	if rt, depth := r.FindFull(args...); depth > 0 {
 		args = append([]string{strings.Join(args[:depth], string(separator))}, args[depth:]...)
-		rt.Handler(NewContext(s, m, args, rt))
+		ctx := NewContext(s, m, args, rt)
+		err := rt.Handler(ctx)
+		if err != nil {
+			HandleError(ctx, err)
+		}
 	} else {
 		return ErrCouldNotFindRoute
 	}
