@@ -10,9 +10,10 @@ import (
 // Context represents a command context
 type Context struct {
 	// Route is the route that this command came from
-	Route *Route
-	Msg   *discordgo.Message
-	Ses   *discordgo.Session
+	Route   *Route
+	Msg     *discordgo.Message
+	Channel *discordgo.Channel
+	Ses     *discordgo.Session
 
 	// List of arguments supplied with the command
 	Args Args
@@ -49,8 +50,18 @@ func (c *Context) ReplyEmbed(args ...interface{}) (*discordgo.Message, error) {
 	})
 }
 
-// Guild retrieves a guild from the state or restapi
-func (c *Context) Guild(guildID string) (*discordgo.Guild, error) {
+// Guild returns the guild the context originated from if it did, else an error
+func (c *Context) Guild() (g *discordgo.Guild, err error) {
+	return c.Channel.Guild()
+}
+
+// Author returns the User that sent the message
+func (c *Context) Author() *discordgo.User {
+	return c.Msg.Author
+}
+
+// GetGuild retrieves a guild from the state or restapi
+func (c *Context) GetGuild(guildID string) (*discordgo.Guild, error) {
 	g, err := c.Ses.State.Guild(guildID)
 	if err != nil {
 		g, err = c.Ses.Guild(guildID)
@@ -58,8 +69,8 @@ func (c *Context) Guild(guildID string) (*discordgo.Guild, error) {
 	return g, err
 }
 
-// Channel retrieves a channel from the state or restapi
-func (c *Context) Channel(channelID string) (*discordgo.Channel, error) {
+// GetChannel retrieves a channel from the state or restapi
+func (c *Context) GetChannel(channelID string) (*discordgo.Channel, error) {
 	ch, err := c.Ses.State.Channel(channelID)
 	if err != nil {
 		ch, err = c.Ses.Channel(channelID)
@@ -67,8 +78,8 @@ func (c *Context) Channel(channelID string) (*discordgo.Channel, error) {
 	return ch, err
 }
 
-// Member retrieves a member from the state or restapi
-func (c *Context) Member(guildID, userID string) (*discordgo.Member, error) {
+// GetMember retrieves a member from the state or restapi
+func (c *Context) GetMember(guildID, userID string) (*discordgo.Member, error) {
 	m, err := c.Ses.State.Member(guildID, userID)
 	if err != nil {
 		m, err = c.Ses.GuildMember(guildID, userID)
@@ -76,13 +87,40 @@ func (c *Context) Member(guildID, userID string) (*discordgo.Member, error) {
 	return m, err
 }
 
+// SendMessage sends a message to the channel
+func (c Context) SendMessage(content string, embed *discordgo.MessageEmbed, files []*discordgo.File) (message *discordgo.Message, err error) {
+	return c.Channel.SendMessage(content, embed, files)
+}
+
+// SendMessageComplex sends a message to the channel
+func (c Context) SendMessageComplex(data *discordgo.MessageSend) (message *discordgo.Message, err error) {
+	return c.Channel.SendMessageComplex(data)
+}
+
+// EditMessage edits an existing message, replacing it entirely with
+// the given MessageEdit struct
+func (c Context) EditMessage(data *discordgo.MessageEdit) (edited *discordgo.Message, err error) {
+	return c.Channel.EditMessage(data)
+}
+
+// FetchMessage fetches a message with the given ID from the context channel
+func (c Context) FetchMessage(ID string) (message *discordgo.Message, err error) {
+	return c.Channel.FetchMessage(ID)
+}
+
+// GetHistory fetches up to limit messages from the context channel
+func (c Context) GetHistory(limit int, beforeID, afterID, aroundID string) (st []*discordgo.Message, err error) {
+	return c.Channel.GetHistory(limit, beforeID, afterID, aroundID)
+}
+
 // NewContext returns a new context from a message
 func NewContext(s *discordgo.Session, m *discordgo.Message, args Args, route *Route) *Context {
 	return &Context{
-		Route: route,
-		Msg:   m,
-		Ses:   s,
-		Args:  args,
-		Vars:  map[string]interface{}{},
+		Route:   route,
+		Msg:     m,
+		Channel: m.Channel(),
+		Ses:     s,
+		Args:    args,
+		Vars:    map[string]interface{}{},
 	}
 }
