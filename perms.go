@@ -12,15 +12,15 @@ type CasbinMiddleware struct {
 
 // Casbin performs the casbin check on the command
 func (m *CasbinMiddleware) Casbin(fn router.HandlerFunc) router.HandlerFunc {
-	return func(ctx *router.Context) {
+	return func(ctx *router.Context) error {
 		guild, err := ctx.Guild()
 		if err != nil {
-			return
+			return nil
 		}
 		if res := m.Enforce(ctx.Msg.Author.ID, ctx.Msg.GuildID, ctx.Route.Name, "execute"); res || guild.OwnerID == ctx.Msg.Author.ID {
-			fn(ctx)
+			return fn(ctx)
 		} else {
-			_, _ = ctx.ReplyEmbed("You do not have permission to use this command.")
+			return router.ErrUserNoPermissions
 		}
 	}
 }
