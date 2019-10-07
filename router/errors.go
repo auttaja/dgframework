@@ -26,9 +26,21 @@ var (
 	// ErrUserNoPermissions should get returned by the bot if the user runs a command that they do not
 	// have permission for to run and the bot does not handle the return message itself
 	ErrUserNoPermissions = errors.New("the user does not have the needed permissions to run this command")
+
+	// ErrNotAGuild should get returned by the bot if the user runs a command that needs to be ran
+	// inside a guild to work, but they ran it in a DM and the bot does not handle the return message itself
+	ErrNotAGuild = errors.New("this command can only be ran inside a guild, but it wasn't")
+
+	// ErrNotADM should get returned by the bot if the user runs a command that needs to be ran
+	// inside a DM to work, but they ran it in a Guild and the bot does not handle the return message itself
+	ErrNotADM = errors.New("this command can only be ran inside DMs, but it wasn't")
+
+	// ErrNotFound should get returned by the bot if the user requests (an operation on)
+	// a resource that doesn't exist and the bot does not handle the return message itself
+	ErrNotFound = errors.New("the requested object wasn't found")
 )
 
-// HandleError
+// HandleError is the default handler of errors
 func HandleError(ctx *Context, err error) {
 	if err == nil {
 		return
@@ -46,7 +58,7 @@ func HandleError(ctx *Context, err error) {
 	case ErrInvalidArgument:
 		errString = "The arguments that you passed to the command are invalid."
 		if ctx.Route.UsageString != "" {
-			errString += fmt.Sprintf(" Please make sure you are followin the user instructions: `%s`", ctx.Route.UsageString)
+			errString += fmt.Sprintf(" Please make sure you are following the user instructions: `%s`", ctx.Route.UsageString)
 		}
 	case ErrBotNoPermissions:
 		errString = "The bot does not have the required permissions for the command that was ran, please make sure it has before running it again."
@@ -54,6 +66,12 @@ func HandleError(ctx *Context, err error) {
 		errString = "You do not have permission to use this command."
 	case ErrCouldNotFindRoute:
 		errString = "This command does not exist"
+	case ErrNotAGuild:
+		errString = "This command cannot be ran in DMs"
+	case ErrNotADM:
+		errString = "This command cannot be ran in a Guild"
+	case ErrNotFound:
+		errString = "The resource or object the command needed does not exist"
 	default:
 		if sentry.CurrentHub().Client() != nil {
 			sentry.CaptureException(err)
