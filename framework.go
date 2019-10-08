@@ -106,7 +106,6 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 
 	if b.pluginLocation != "" {
 		err = bot.LoadPlugins(b.pluginLocation)
-		return nil, err
 	}
 	return
 }
