@@ -114,18 +114,16 @@ func NewErrBotHasNoPermissions(err *discordgo.RESTError) *ErrBotHasNoPermissions
 
 	path := strings.TrimPrefix(r.EndpointPath, discordgo.EndpointAPI)
 	pathParts := strings.Split(path, "/")
-	BaseAPIEndpoint := pathParts[0]
-	APIEndpoint := BaseAPIEndpoint
+	APIEndpoint := pathParts[0]
 	if len(pathParts) > 2 {
-		APIEndpoint = pathParts[2]
+		APIEndpoint += "/" + pathParts[2]
 	}
-	var LongerAPIEndpoint string
 	if len(pathParts) > 4 {
-		LongerAPIEndpoint = "/" + pathParts[4]
+		APIEndpoint += "/" + pathParts[4]
 	}
 
-	switch fmt.Sprintf("%s/%s/%s%s", err.Request.Method, BaseAPIEndpoint, APIEndpoint, LongerAPIEndpoint) {
-	case "PATCH/guilds/guild":
+	switch fmt.Sprintf("%s/%s", err.Request.Method, APIEndpoint) {
+	case "PATCH/guilds":
 		r.Permission = "Manage Server"
 	case "POST/guilds/channels", "PATCH/guilds/channels":
 		r.Permission = "Manage Channels"
@@ -148,7 +146,7 @@ func NewErrBotHasNoPermissions(err *discordgo.RESTError) *ErrBotHasNoPermissions
 	case "POST/guilds/emojis", "PATCH/guilds/emojis", "DELETE/guilds/emojis":
 		r.Permission = "Manage Emojis"
 
-	case "PUT/channels/channels", "PATCH/channels/channels", "DELETE/channels/channels":
+	case "PUT/channels", "PATCH/channels", "DELETE/channels":
 		r.Permission = "Manage Channels"
 	case "GET/channels/messages":
 		r.Permission = "Read Messages and/or Read Message History"
@@ -169,9 +167,9 @@ func NewErrBotHasNoPermissions(err *discordgo.RESTError) *ErrBotHasNoPermissions
 	case "PUT/channels/pins", "DELETE/channels/pins":
 		r.Permission = "Manage Messages"
 
-	case "DELETE/invites/invites":
+	case "DELETE/invites":
 		r.Permission = "Manage Guild and/or Manage Channels"
-	case "POST/channels/webhooks", "GET/channels/webhooks", "GET/guilds/webhooks", "PATCH/webhooks/webhooks":
+	case "POST/channels/webhooks", "GET/channels/webhooks", "GET/guilds/webhooks", "PATCH/webhooks":
 		r.Permission = "Manage Webhooks"
 	case "GET/guilds/audit-logs":
 		r.Permission = "View Audit Log"
