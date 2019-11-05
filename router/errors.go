@@ -6,7 +6,6 @@ import (
 	"github.com/auttaja/discordgo"
 	"github.com/getsentry/sentry-go"
 	"log"
-	"os"
 	"strings"
 )
 
@@ -82,10 +81,8 @@ func HandleError(ctx *Context, err error) {
 		if sentry.CurrentHub().Client() != nil {
 			sentry.CaptureException(err)
 			errString = "An unknown error has occurred and has been reported to my developers, sorry for any inconvenience this has caused"
-		} else if e, ok := os.LookupEnv("PANIC_ON_ERROR"); ok && e == "1" {
-			panic(err)
 		} else {
-			log.Println(err)
+			log.Printf("error happened in %s and was handled, error message: %s", ctx.Route.Name, err)
 		}
 	}
 
