@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/auttaja/discordgo"
 	"github.com/getsentry/sentry-go"
+	"log"
+	"os"
 	"strings"
 )
 
@@ -80,8 +82,10 @@ func HandleError(ctx *Context, err error) {
 		if sentry.CurrentHub().Client() != nil {
 			sentry.CaptureException(err)
 			errString = "An unknown error has occurred and has been reported to my developers, sorry for any inconvenience this has caused"
-		} else {
+		} else if e, ok := os.LookupEnv("PANIC_ON_ERROR"); ok && e == "1" {
 			panic(err)
+		} else {
+			log.Println(err)
 		}
 	}
 
@@ -91,6 +95,31 @@ func HandleError(ctx *Context, err error) {
 			NewEmbed().
 			SetTimestampNow().
 			SetDescription(errString).
+			SetColor(discordgo.ColorRed),
+		nil,
+	)
+}
+
+func HandlePanic(ctx *Context) {
+	p := recover()
+	if p == nil {
+		return
+	}
+
+	if e, ok := p.(error); ok {
+		HandleError(ctx, e)
+		return
+	}
+
+	log.Printf("Panic happened in %s and was handled, panic message: ", ctx.Route.Name)
+	log.Println(p)
+
+	_, _ = ctx.SendMessage(
+		"",
+		discordgo.
+			NewEmbed().
+			SetTimestampNow().
+			SetDescription("An unknown error has occurred and has been reported to my developers, sorry for any inconvenience this has caused").
 			SetColor(discordgo.ColorRed),
 		nil,
 	)
