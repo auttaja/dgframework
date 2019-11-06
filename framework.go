@@ -3,7 +3,6 @@ package dgframework
 import (
 	"context"
 	"fmt"
-	"github.com/auttaja/dgframework/utils"
 	"log"
 	"os"
 	"path/filepath"
@@ -11,10 +10,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/auttaja/dgframework/utils"
+	"github.com/auttaja/dgframework/x/discordrolemanager"
+
 	"github.com/auttaja/dgframework/router"
 	"github.com/auttaja/discordgo"
 	"github.com/bwmarrin/snowflake"
 	"github.com/casbin/casbin"
+	mongodbadapter "github.com/casbin/mongodb-adapter"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -37,6 +40,7 @@ type BotBuilder struct {
 	dbSession         *mongo.Client
 	useStatefulEmbeds bool
 	startBot          bool
+	casbinDBURL       string
 }
 
 // BotPlugin represents a plugin, it must contain an Init function
@@ -91,9 +95,15 @@ func (b *BotBuilder) AutoStartBot() *BotBuilder {
 	return b
 }
 
+// SetCasbinDBURL sets the DB URL for Casbin to use for policy storage
+func (b *BotBuilder) SetCasbinDBURL(URL string) *BotBuilder {
+	b.casbinDBURL = URL
+	return b
+}
+
 // Build will build the bot using the provided information in the BotBuilder
 func (b *BotBuilder) Build() (bot *Bot, err error) {
-	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession)
+	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession, b.casbinDBURL)
 	if err != nil {
 		return
 	}
@@ -126,7 +136,7 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 }
 
 // NewBot returns a new Bot instance
-func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client) (*Bot, error) {
+func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client, casbinMongoURL string) (*Bot, error) {
 	bot := new(Bot)
 
 	dg, err := discordgo.New(token)
@@ -148,6 +158,13 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Clie
 		return nil, err
 	}
 	bot.snowflakeNode = node
+
+	bot.Enforcer = casbin.NewEnforcer("rbac/role_model.conf")
+	a := mongodbadapter.NewAdapter(casbinMongoURL)
+	bot.Enforcer.SetAdapter(a)
+
+	rm := discordrolemanager.NewRoleManager(dg)
+	bot.Enforcer.SetRoleManager(rm)
 
 	return bot, nil
 }
