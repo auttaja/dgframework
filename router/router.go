@@ -259,6 +259,7 @@ func (r *Route) FindAndExecute(s *discordgo.Session, prefix string, botID string
 	if rt, depth := r.FindFull(args...); depth > 0 {
 		args = append([]string{strings.Join(args[:depth], string(separator))}, args[depth:]...)
 		ctx := NewContext(s, m, args, rt)
+		defer HandlePanic(ctx)
 		err := rt.Handler(ctx)
 		if err != nil {
 			HandleError(ctx, err)

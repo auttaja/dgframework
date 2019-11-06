@@ -36,6 +36,7 @@ type BotBuilder struct {
 	pluginLocation    string
 	dbSession         *mongo.Client
 	useStatefulEmbeds bool
+	startBot          bool
 }
 
 // BotPlugin represents a plugin, it must contain an Init function
@@ -84,6 +85,12 @@ func (b *BotBuilder) SetPluginLocation(location string) *BotBuilder {
 	return b
 }
 
+// AutoStartBot makes the bot automatically start when it gets build
+func (b *BotBuilder) AutoStartBot() *BotBuilder {
+	b.startBot = true
+	return b
+}
+
 // Build will build the bot using the provided information in the BotBuilder
 func (b *BotBuilder) Build() (bot *Bot, err error) {
 	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession)
@@ -95,7 +102,7 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 		dbContext, _ := context.WithTimeout(context.Background(), 5*time.Second)
 		err = bot.DB.Connect(dbContext)
 		if err != nil {
-			return nil, err
+			return
 		}
 	}
 
@@ -106,7 +113,15 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 
 	if b.pluginLocation != "" {
 		err = bot.LoadPlugins(b.pluginLocation)
+		if err != nil {
+			return
+		}
 	}
+
+	if b.startBot {
+		err = bot.Session.Open()
+	}
+
 	return
 }
 
