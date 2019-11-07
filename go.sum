@@ -9,6 +9,8 @@ github.com/auttaja/discordgo v0.20.8 h1:l28+jpOuzKRZZDSfTmTuCsAkqh1tw7/H40PHluX/
 github.com/auttaja/discordgo v0.20.8/go.mod h1:C7aEH0Ej8ZEFUL7qY7cwmKh/GVCk9JVm64lNHrbzCG4=
 github.com/auttaja/discordgo v0.20.14 h1:9v5Oj+wGfDuBr+5pVFJUnTcUeKnm2gzB+huPWgMaa/0=
 github.com/auttaja/discordgo v0.20.14/go.mod h1:C7aEH0Ej8ZEFUL7qY7cwmKh/GVCk9JVm64lNHrbzCG4=
+github.com/auttaja/discordgo v0.20.16 h1:5c7PItIIs5kBGYVXffDhJW5O9Md8/NZ3XzMp2BeJoX0=
+github.com/auttaja/discordgo v0.20.16/go.mod h1:C7aEH0Ej8ZEFUL7qY7cwmKh/GVCk9JVm64lNHrbzCG4=
 github.com/aymerick/raymond v2.0.2+incompatible/go.mod h1:osfaiScAUVup+UC9Nfq76eWqDhXlp+4UYaA8uhTBO6g=
 github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgISZN0=
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=

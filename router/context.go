@@ -44,10 +44,8 @@ func (c *Context) Reply(args ...interface{}) (*discordgo.Message, error) {
 }
 
 // ReplyEmbed replies to the sender with an embed
-func (c *Context) ReplyEmbed(args ...interface{}) (*discordgo.Message, error) {
-	return c.Ses.ChannelMessageSendEmbed(c.Msg.ChannelID, &discordgo.MessageEmbed{
-		Description: fmt.Sprint(args...),
-	})
+func (c *Context) ReplyEmbed(embed *discordgo.MessageEmbed) (*discordgo.Message, error) {
+	return c.Channel.SendMessage("", embed, nil)
 }
 
 // Guild returns the guild the context originated from if it did, else an error
@@ -111,6 +109,11 @@ func (c Context) FetchMessage(ID string) (message *discordgo.Message, err error)
 // GetHistory fetches up to limit messages from the context channel
 func (c Context) GetHistory(limit int, beforeID, afterID, aroundID string) (st []*discordgo.Message, err error) {
 	return c.Channel.GetHistory(limit, beforeID, afterID, aroundID)
+}
+
+// GetHistoryIterator returns a bare HistoryIterator for the context channel.
+func (c Context) GetHistoryIterator() *discordgo.HistoryIterator {
+	return c.Channel.GetHistoryIterator()
 }
 
 // NewContext returns a new context from a message
