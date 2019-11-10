@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/auttaja/discordgo"
 	"github.com/getsentry/sentry-go"
+	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"strings"
 )
@@ -36,6 +37,9 @@ var (
 	// ErrNotFound should get returned by the bot if the user requests (an operation on)
 	// a resource that doesn't exist and the bot does not handle the return message itself
 	ErrNotFound = errors.New("the requested object wasn't found")
+
+	// ErrNotImplemented gets thrown when a function or command gets called that hasn't been implemented yet
+	ErrNotImplemented = errors.New("this hasn't been implemented yet")
 )
 
 // HandleError is the default handler of errors
@@ -68,6 +72,16 @@ func HandleError(ctx *Context, err error) {
 		errString = "This command cannot be ran in a Guild"
 	case ErrNotFound:
 		errString = "The resource or object the command needed does not exist"
+	case ErrNotImplemented:
+		errString = "This hasn't been implemented yet, please try again later when it has been"
+	case mongo.ErrClientDisconnected, mongo.ErrWrongClient, mongo.ErrMissingResumeToken:
+		errString = "Something went wrong while accessing the database, please try again later"
+		log.Println(err)
+	case mongo.ErrEmptySlice, mongo.ErrNilDocument, mongo.ErrNilCursor, mongo.ErrNoDocuments:
+		errString = "I was unable to find the requested resource in my database"
+	case mongo.ErrInvalidIndexValue, mongo.ErrNonStringIndexName, mongo.ErrUnacknowledgedWrite, mongo.ErrMultipleIndexDrop:
+		errString = "There was an issue while working with the database, please try again later"
+		log.Println(err)
 	default:
 		if info, ok := err.(ErrBotHasNoPermissions); ok {
 			if info.Permission == "" {

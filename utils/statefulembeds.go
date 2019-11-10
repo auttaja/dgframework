@@ -209,7 +209,7 @@ func (s *StatefulEmbed) Show() (err error) {
 
 // StatefulReactionHandler is the reaction add event handler for the stateful embeds
 func StatefulReactionHandler(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
-	if s.State.User.ID == r.UserID {
+	if s.State.MyUser().ID == r.UserID {
 		return
 	}
 
