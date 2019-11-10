@@ -111,7 +111,7 @@ func (b *BotBuilder) SetNATSURL(URL string) *BotBuilder {
 
 // Build will build the bot using the provided information in the BotBuilder
 func (b *BotBuilder) Build() (bot *Bot, err error) {
-	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession, b.casbinDBURL)
+	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession, b.casbinDBURL, b.natsURL)
 	if err != nil {
 		return
 	}
