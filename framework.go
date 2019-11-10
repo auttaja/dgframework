@@ -132,7 +132,7 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 		}
 
 		cache, err := dstatecache.NewDgoCache(httpClient, b.stateURL)
-		if err == nil {
+		if err != nil {
 			log.Fatalln("Unable to create DgoCache: ", err)
 		}
 		bot.Session.State = cache
