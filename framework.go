@@ -143,6 +143,9 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Clie
 	if err != nil {
 		return nil, err
 	}
+
+	dg.LogLevel = discordgo.LogDebug
+
 	dg.ShardID = shardID
 	dg.ShardCount = shardCount
 	bot.Router = router.New()
