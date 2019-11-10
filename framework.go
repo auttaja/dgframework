@@ -257,7 +257,7 @@ func (b *Bot) LoadPlugins(location string) error {
 }
 
 func (b *Bot) ready(s *discordgo.Session, r *discordgo.Ready) {
-	log.Printf("%s is now ready", s.State.User.Username)
+	log.Printf("%s is now ready", s.State.MyUser().Username)
 	for _, guild := range r.Guilds {
 		if guild.Large {
 			err := s.RequestGuildMembers(guild.ID, "", 1000)
