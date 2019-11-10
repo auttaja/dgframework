@@ -2,10 +2,11 @@ package utils
 
 import (
 	"fmt"
-	"github.com/auttaja/discordgo"
 	"log"
 	"math"
 	"sync"
+
+	"github.com/auttaja/discordgo"
 )
 
 var sessionsHolder = newSessions()
@@ -209,7 +210,7 @@ func (s *StatefulEmbed) Show() (err error) {
 
 // StatefulReactionHandler is the reaction add event handler for the stateful embeds
 func StatefulReactionHandler(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
-	if s.State.User.ID == r.UserID {
+	if s.State.MyUser().ID == r.UserID {
 		return
 	}
 
