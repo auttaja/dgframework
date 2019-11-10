@@ -92,11 +92,11 @@ func HandleError(ctx *Context, err error) {
 			break
 		}
 
+		errString = "An unknown error has occurred and has been reported to my developers, sorry for any inconvenience this has caused"
+
+		log.Printf("error happened in %s and was handled, error message: %s", ctx.Route.Name, err)
 		if sentry.CurrentHub().Client() != nil {
 			sentry.CaptureException(err)
-			errString = "An unknown error has occurred and has been reported to my developers, sorry for any inconvenience this has caused"
-		} else {
-			log.Printf("error happened in %s and was handled, error message: %s", ctx.Route.Name, err)
 		}
 	}
 
