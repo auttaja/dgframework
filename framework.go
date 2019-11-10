@@ -167,9 +167,15 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Clie
 
 	dg.ShardID = shardID
 	dg.ShardCount = shardCount
+
+	user, err := dg.User("@me")
+	if err != nil {
+		return nil, err
+	}
+
 	bot.Router = router.New()
 	dg.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
-		_ = bot.Router.FindAndExecute(dg, prefix, dg.State.User.ID, m.Message)
+		_ = bot.Router.FindAndExecute(dg, prefix, user.ID, m.Message)
 	})
 	dg.AddHandler(bot.ready)
 	bot.Session = dg
