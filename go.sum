@@ -7,6 +7,8 @@ github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398/go.mod h1:a1uqR
 github.com/ajg/form v1.5.1/go.mod h1:uL1WgH+h2mgNtvBq0339dVnzXdBETtL2LeUXaIv25UY=
 github.com/auttaja/discordgo v0.20.27 h1:en8Q6FwLjzh+GwK4HMI9ae4uyqIH7CCAaG2GGrqJ4d0=
 github.com/auttaja/discordgo v0.20.27/go.mod h1:g4qe1JP2e8YvX3YOKYjXxHixqxS0KRMzWe00sjQefjg=
+github.com/auttaja/discordgo v0.20.28 h1:oWJoZiWClEU0dL9mOGVKAnBvwLfywrI3IevQO3XAcis=
+github.com/auttaja/discordgo v0.20.28/go.mod h1:g4qe1JP2e8YvX3YOKYjXxHixqxS0KRMzWe00sjQefjg=
 github.com/aymerick/raymond v2.0.2+incompatible/go.mod h1:osfaiScAUVup+UC9Nfq76eWqDhXlp+4UYaA8uhTBO6g=
 github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgISZN0=
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
