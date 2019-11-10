@@ -131,7 +131,7 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 			Timeout: time.Second * 10,
 		}
 
-		cache, err := dstatecache.NewDgoCache(httpClient, b.stateURL)
+		cache, err := dstatecache.NewDgoCache(httpClient, b.stateURL, bot.Session)
 		if err != nil {
 			log.Fatalln("Unable to create DgoCache: ", err)
 		}

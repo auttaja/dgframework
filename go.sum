@@ -23,6 +23,10 @@ github.com/auttaja/dstatecache-go v0.0.0-20191110194707-15e6c87e71f6 h1:HQnUqmE7
 github.com/auttaja/dstatecache-go v0.0.0-20191110194707-15e6c87e71f6/go.mod h1:WFmKu9oivKAV5HEee2Xtd2t1PZF8l6uKbaa7nQgiBaE=
 github.com/auttaja/dstatecache-go v0.0.0-20191110204606-5d08c8f03178 h1:wnZCotJfJDXvgIrWDK1j4DFs02RwDI6tnpPi6nlSgk4=
 github.com/auttaja/dstatecache-go v0.0.0-20191110204606-5d08c8f03178/go.mod h1:WFmKu9oivKAV5HEee2Xtd2t1PZF8l6uKbaa7nQgiBaE=
+github.com/auttaja/dstatecache-go v0.0.0-20191110212754-0378910a71c8 h1:dZOv/gl7ol6DXy9hBvPEFqPyAbcQrNV0MsTiLGrBKyQ=
+github.com/auttaja/dstatecache-go v0.0.0-20191110212754-0378910a71c8/go.mod h1:WFmKu9oivKAV5HEee2Xtd2t1PZF8l6uKbaa7nQgiBaE=
+github.com/auttaja/dstatecache-go v0.0.0-20191110213848-6b7007d4732e h1:yll5G/6dmKPh59Fm/eZAUNa1kMaESbDcpyZF/tpWI2M=
+github.com/auttaja/dstatecache-go v0.0.0-20191110213848-6b7007d4732e/go.mod h1:WFmKu9oivKAV5HEee2Xtd2t1PZF8l6uKbaa7nQgiBaE=
 github.com/aymerick/raymond v2.0.2+incompatible/go.mod h1:osfaiScAUVup+UC9Nfq76eWqDhXlp+4UYaA8uhTBO6g=
 github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgISZN0=
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
