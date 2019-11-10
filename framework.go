@@ -46,6 +46,7 @@ type BotBuilder struct {
 	casbinDBURL       string
 	natsURL           string
 	stateURL          string
+	loglevel          int
 }
 
 // BotPlugin represents a plugin, it must contain an Init function
@@ -60,6 +61,7 @@ func NewBotBuilder(token string) *BotBuilder {
 		token:      token,
 		prefix:     "-",
 		shardCount: 1,
+		loglevel:   3,
 	}
 }
 
@@ -118,9 +120,16 @@ func (b *BotBuilder) SetStateURL(URL string) *BotBuilder {
 	return b
 }
 
+func (b *BotBuilder) SetLogLevel(level int) *BotBuilder {
+	if level >= 0 && level < 4 {
+		b.loglevel = level
+	}
+	return b
+}
+
 // Build will build the bot using the provided information in the BotBuilder
 func (b *BotBuilder) Build() (bot *Bot, err error) {
-	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession, b.casbinDBURL, b.natsURL)
+	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession, b.casbinDBURL, b.natsURL, b.loglevel)
 	if err != nil {
 		return
 	}
@@ -171,7 +180,7 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 }
 
 // NewBot returns a new Bot instance
-func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client, casbinMongoURL string, natsURL string) (*Bot, error) {
+func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client, casbinMongoURL string, natsURL string, loglevel int) (*Bot, error) {
 	bot := new(Bot)
 
 	dg, err := discordgo.New(token)
@@ -190,7 +199,7 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Clie
 		dg.NatsQueueName = ""
 	}
 
-	dg.LogLevel = discordgo.LogDebug
+	dg.LogLevel = loglevel
 
 	dg.ShardID = shardID
 	dg.ShardCount = shardCount
