@@ -12,6 +12,7 @@ import (
 
 	"github.com/auttaja/dgframework/utils"
 	"github.com/auttaja/dgframework/x/discordrolemanager"
+	nats "github.com/nats-io/nats.go"
 
 	"github.com/auttaja/dgframework/router"
 	"github.com/auttaja/discordgo"
@@ -41,6 +42,7 @@ type BotBuilder struct {
 	useStatefulEmbeds bool
 	startBot          bool
 	casbinDBURL       string
+	natsURL           string
 }
 
 // BotPlugin represents a plugin, it must contain an Init function
@@ -101,6 +103,12 @@ func (b *BotBuilder) SetCasbinDBURL(URL string) *BotBuilder {
 	return b
 }
 
+// SetNATSURL sets the NATS URL to use for distributed communications
+func (b *BotBuilder) SetNATSURL(URL string) *BotBuilder {
+	b.natsURL = URL
+	return b
+}
+
 // Build will build the bot using the provided information in the BotBuilder
 func (b *BotBuilder) Build() (bot *Bot, err error) {
 	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession, b.casbinDBURL)
@@ -136,12 +144,23 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 }
 
 // NewBot returns a new Bot instance
-func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client, casbinMongoURL string) (*Bot, error) {
+func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client, casbinMongoURL string, natsURL string) (*Bot, error) {
 	bot := new(Bot)
 
 	dg, err := discordgo.New(token)
 	if err != nil {
 		return nil, err
+	}
+
+	if natsURL != "" {
+		nats, err := nats.Connect(natsURL)
+		if err != nil {
+			return nil, err
+		}
+
+		dg.NATS = nats
+		dg.NatsMode = 1
+		dg.NatsQueueName = ""
 	}
 
 	dg.LogLevel = discordgo.LogDebug
