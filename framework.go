@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"plugin"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/auttaja/dgframework/utils"
 	"github.com/auttaja/dgframework/x/discordrolemanager"
+	"github.com/auttaja/dstatecache-go"
 	nats "github.com/nats-io/nats.go"
 
 	"github.com/auttaja/dgframework/router"
@@ -43,6 +45,7 @@ type BotBuilder struct {
 	startBot          bool
 	casbinDBURL       string
 	natsURL           string
+	stateURL          string
 }
 
 // BotPlugin represents a plugin, it must contain an Init function
@@ -109,11 +112,28 @@ func (b *BotBuilder) SetNATSURL(URL string) *BotBuilder {
 	return b
 }
 
+// SetStateURL sets the remote State URL
+func (b *BotBuilder) SetStateURL(URL string) *BotBuilder {
+	b.stateURL = URL
+	return b
+}
+
 // Build will build the bot using the provided information in the BotBuilder
 func (b *BotBuilder) Build() (bot *Bot, err error) {
 	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession, b.casbinDBURL, b.natsURL)
 	if err != nil {
 		return
+	}
+
+	if b.stateURL != "" {
+		httpClient := &http.Client{
+			Timeout: time.Second * 10,
+		}
+
+		cache, err := dstatecache.NewDgoCache(httpClient, b.stateURL)
+		if err != nil {
+			bot.Session.State = cache
+		}
 	}
 
 	if b.dbSession != nil {
