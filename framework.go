@@ -126,6 +126,7 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 	}
 
 	if b.stateURL != "" {
+		log.Println("Using remote state")
 		httpClient := &http.Client{
 			Timeout: time.Second * 10,
 		}
@@ -133,6 +134,8 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 		cache, err := dstatecache.NewDgoCache(httpClient, b.stateURL)
 		if err != nil {
 			bot.Session.State = cache
+		} else {
+			log.Fatalln("Unable to create DgoCache: ", err)
 		}
 	}
 
