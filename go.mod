@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/auttaja/discordgo v0.20.29
-	github.com/auttaja/dstatecache-go v0.0.0-20191110192747-aaba05a0c082
+	github.com/auttaja/dstatecache-go v0.0.0-20191110194508-2b56253e8008
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/casbin/casbin v1.9.1
 	github.com/casbin/casbin/v2 v2.1.0 // indirect

@@ -14,6 +14,8 @@ github.com/auttaja/discordgo v0.20.29 h1:FYWRhiTeKsmHrD2vP3b22R+3ZZr3RiLMqEK13+q
 github.com/auttaja/discordgo v0.20.29/go.mod h1:BzLnMG57E4y9WZFsPoIn40/f9zd6H3TZ6P8NQiPxZmw=
 github.com/auttaja/dstatecache-go v0.0.0-20191110192747-aaba05a0c082 h1:AhSKnxF584eREi9uGqKnven9kTAmEu7ybKsbJeVektw=
 github.com/auttaja/dstatecache-go v0.0.0-20191110192747-aaba05a0c082/go.mod h1:WFmKu9oivKAV5HEee2Xtd2t1PZF8l6uKbaa7nQgiBaE=
+github.com/auttaja/dstatecache-go v0.0.0-20191110194508-2b56253e8008 h1:bMXZ8APSiRpZRqzP+erHncaFh+UulDb/roN6r9wDkSQ=
+github.com/auttaja/dstatecache-go v0.0.0-20191110194508-2b56253e8008/go.mod h1:WFmKu9oivKAV5HEee2Xtd2t1PZF8l6uKbaa7nQgiBaE=
 github.com/aymerick/raymond v2.0.2+incompatible/go.mod h1:osfaiScAUVup+UC9Nfq76eWqDhXlp+4UYaA8uhTBO6g=
 github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgISZN0=
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
