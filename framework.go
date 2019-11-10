@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"plugin"
@@ -12,6 +13,8 @@ import (
 
 	"github.com/auttaja/dgframework/utils"
 	"github.com/auttaja/dgframework/x/discordrolemanager"
+	"github.com/auttaja/dstatecache-go"
+	nats "github.com/nats-io/nats.go"
 
 	"github.com/auttaja/dgframework/router"
 	"github.com/auttaja/discordgo"
@@ -41,6 +44,8 @@ type BotBuilder struct {
 	useStatefulEmbeds bool
 	startBot          bool
 	casbinDBURL       string
+	natsURL           string
+	stateURL          string
 }
 
 // BotPlugin represents a plugin, it must contain an Init function
@@ -101,11 +106,41 @@ func (b *BotBuilder) SetCasbinDBURL(URL string) *BotBuilder {
 	return b
 }
 
+// SetNATSURL sets the NATS URL to use for distributed communications
+func (b *BotBuilder) SetNATSURL(URL string) *BotBuilder {
+	b.natsURL = URL
+	return b
+}
+
+// SetStateURL sets the remote State URL
+func (b *BotBuilder) SetStateURL(URL string) *BotBuilder {
+	b.stateURL = URL
+	return b
+}
+
 // Build will build the bot using the provided information in the BotBuilder
 func (b *BotBuilder) Build() (bot *Bot, err error) {
-	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession, b.casbinDBURL)
+	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession, b.casbinDBURL, b.natsURL)
 	if err != nil {
 		return
+	}
+
+	if b.stateURL != "" {
+		log.Println("Using remote state")
+		httpClient := &http.Client{
+			Timeout: time.Second * 10,
+		}
+
+		cache, err := dstatecache.NewDgoCache(httpClient, b.stateURL)
+		if err != nil {
+			log.Fatalln("Unable to create DgoCache: ", err)
+		}
+		bot.Session.State = cache
+		user, err := bot.Session.State.MyUser()
+		if err != nil {
+			log.Fatalln("Unable to connect to remote state cache: ", err)
+		}
+		log.Println("Remote state test successful")
 	}
 
 	if b.dbSession != nil {
@@ -136,18 +171,39 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 }
 
 // NewBot returns a new Bot instance
-func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client, casbinMongoURL string) (*Bot, error) {
+func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client, casbinMongoURL string, natsURL string) (*Bot, error) {
 	bot := new(Bot)
 
 	dg, err := discordgo.New(token)
 	if err != nil {
 		return nil, err
 	}
+
+	if natsURL != "" {
+		nats, err := nats.Connect(natsURL)
+		if err != nil {
+			return nil, err
+		}
+
+		dg.NATS = nats
+		dg.NatsMode = 1
+		dg.NatsQueueName = ""
+	}
+
+	dg.LogLevel = discordgo.LogDebug
+
 	dg.ShardID = shardID
 	dg.ShardCount = shardCount
+
+	user, err := dg.FetchUser("@me")
+	if err != nil {
+		return nil, err
+	}
+
 	bot.Router = router.New()
-	dg.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
-		_ = bot.Router.FindAndExecute(dg, prefix, dg.State.MyUser().ID, m.Message)
+	dg.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		log.Println(dg, prefix, user, m, bot)
+		_ = bot.Router.FindAndExecute(dg, prefix, user.ID, m.Message)
 	})
 	dg.AddHandler(bot.ready)
 	bot.Session = dg
@@ -159,12 +215,14 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Clie
 	}
 	bot.snowflakeNode = node
 
-	bot.Enforcer = casbin.NewEnforcer("rbac/role_model.conf")
-	a := mongodbadapter.NewAdapter(casbinMongoURL)
-	bot.Enforcer.SetAdapter(a)
+	if casbinMongoURL != "" {
+		bot.Enforcer = casbin.NewEnforcer("rbac/role_model.conf")
+		a := mongodbadapter.NewAdapter(casbinMongoURL)
+		bot.Enforcer.SetAdapter(a)
 
-	rm := discordrolemanager.NewRoleManager(dg)
-	bot.Enforcer.SetRoleManager(rm)
+		rm := discordrolemanager.NewRoleManager(dg)
+		bot.Enforcer.SetRoleManager(rm)
+	}
 
 	return bot, nil
 }

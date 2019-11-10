@@ -2,10 +2,11 @@ package utils
 
 import (
 	"fmt"
-	"github.com/auttaja/discordgo"
 	"log"
 	"math"
 	"sync"
+
+	"github.com/auttaja/discordgo"
 )
 
 var sessionsHolder = newSessions()
