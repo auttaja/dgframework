@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/Joker/hpp v1.0.0 // indirect
 	github.com/auttaja/discordgo v0.20.30
-	github.com/auttaja/dstatecache-go v0.0.0-20191110213848-6b7007d4732e
+	github.com/auttaja/dstatecache-go v0.0.0-20191110215605-227321103c90
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/casbin/casbin v1.9.1
 	github.com/casbin/casbin/v2 v2.1.0 // indirect
