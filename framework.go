@@ -159,12 +159,14 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Clie
 	}
 	bot.snowflakeNode = node
 
-	bot.Enforcer = casbin.NewEnforcer("rbac/role_model.conf")
-	a := mongodbadapter.NewAdapter(casbinMongoURL)
-	bot.Enforcer.SetAdapter(a)
+	if casbinMongoURL != "" {
+		bot.Enforcer = casbin.NewEnforcer("rbac/role_model.conf")
+		a := mongodbadapter.NewAdapter(casbinMongoURL)
+		bot.Enforcer.SetAdapter(a)
 
-	rm := discordrolemanager.NewRoleManager(dg)
-	bot.Enforcer.SetRoleManager(rm)
+		rm := discordrolemanager.NewRoleManager(dg)
+		bot.Enforcer.SetRoleManager(rm)
+	}
 
 	return bot, nil
 }
