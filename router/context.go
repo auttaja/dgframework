@@ -118,11 +118,10 @@ func (c Context) GetHistoryIterator() *discordgo.HistoryIterator {
 
 // NewContext returns a new context from a message
 func NewContext(s *discordgo.Session, m *discordgo.Message, args Args, route *Route) *Context {
-	channel, _ := s.State.Channel(m.ChannelID)
 	return &Context{
 		Route:   route,
 		Msg:     m,
-		Channel: channel,
+		Channel: m.Channel(),
 		Ses:     s,
 		Args:    args,
 		Vars:    map[string]interface{}{},
