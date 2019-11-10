@@ -180,12 +180,12 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Clie
 	}
 
 	if natsURL != "" {
-		nats, err := nats.Connect(natsURL)
+		n, err := nats.Connect(natsURL)
 		if err != nil {
 			return nil, err
 		}
 
-		dg.NATS = nats
+		dg.NATS = n
 		dg.NatsMode = 1
 		dg.NatsQueueName = ""
 	}
