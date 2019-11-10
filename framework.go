@@ -168,7 +168,7 @@ func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Clie
 	dg.ShardID = shardID
 	dg.ShardCount = shardCount
 
-	user, err := dg.User("@me")
+	user, err := dg.FetchUser("@me")
 	if err != nil {
 		return nil, err
 	}
