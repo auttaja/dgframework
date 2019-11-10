@@ -136,6 +136,11 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 			log.Fatalln("Unable to create DgoCache: ", err)
 		}
 		bot.Session.State = cache
+		user, err := bot.Session.State.MyUser()
+		if err != nil {
+			log.Fatalln("Unable to connect to remote state cache: ", err)
+		}
+		log.Println("Remote state test successful")
 	}
 
 	if b.dbSession != nil {
