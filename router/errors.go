@@ -7,6 +7,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"runtime/debug"
 	"strings"
 )
 
@@ -119,11 +120,12 @@ func HandlePanic(ctx *Context) {
 
 	if e, ok := p.(error); ok {
 		HandleError(ctx, e)
+		debug.PrintStack()
 		return
 	}
 
-	log.Printf("Panic happened in %s and was handled, panic message: ", ctx.Route.Name)
-	log.Println(p)
+	log.Printf("Panic happened in %s and was handled, panic message: %s", ctx.Route.Name, p)
+	debug.PrintStack()
 
 	_, _ = ctx.SendMessage(
 		"",
