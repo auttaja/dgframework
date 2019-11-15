@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/Joker/hpp v1.0.0 // indirect
-	github.com/auttaja/discordgo v0.20.31
+	github.com/auttaja/discordgo v0.20.34
 	github.com/auttaja/dstatecache-go v0.0.0-20191111202037-227d8f811b51
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/casbin/casbin v1.9.1
@@ -33,6 +33,7 @@ require (
 	github.com/mattn/goveralls v0.0.4 // indirect
 	github.com/nats-io/gnatsd v1.4.1 // indirect
 	github.com/nats-io/go-nats v1.7.2
+	github.com/nats-io/jwt v0.3.2 // indirect
 	github.com/nats-io/nats.go v1.9.1
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
@@ -49,7 +50,10 @@ require (
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	go.mongodb.org/mongo-driver v1.1.3
-	golang.org/x/sys v0.0.0-20191110163157-d32e6e3b99c4 // indirect
+	golang.org/x/crypto v0.0.0-20191112222119-e1110fd1c708 // indirect
+	golang.org/x/net v0.0.0-20191112182307-2180aed22343 // indirect
+	golang.org/x/sys v0.0.0-20191115151921-52ab43148777 // indirect
+	golang.org/x/tools v0.0.0-20191115173008-1c71899d35ca // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 	gopkg.in/yaml.v2 v2.2.5 // indirect
