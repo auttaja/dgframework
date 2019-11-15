@@ -19,8 +19,7 @@ func (m *CasbinMiddleware) Casbin(fn router.HandlerFunc) router.HandlerFunc {
 		}
 		if res := m.Enforce(ctx.Msg.Author.ID, ctx.Msg.GuildID, ctx.Route.Name, "execute"); res || guild.OwnerID == ctx.Msg.Author.ID {
 			return fn(ctx)
-		} else {
-			return router.ErrUserNoPermissions
 		}
+		return router.ErrUserNoPermissions
 	}
 }
