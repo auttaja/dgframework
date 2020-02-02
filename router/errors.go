@@ -50,9 +50,11 @@ func HandleError(ctx *Context, err error) {
 	}
 
 	switch err.(type) {
-	case discordgo.RESTError:
+	case *discordgo.RESTError:
 		if err.(*discordgo.RESTError).Response.StatusCode == 403 {
 			err = NewErrBotHasNoPermissions(err.(*discordgo.RESTError))
+		} else if err.(*discordgo.RESTError).Response.StatusCode == 404 {
+			err = ErrNotFound
 		}
 	}
 
@@ -218,6 +220,10 @@ func NewErrBotHasNoPermissions(err *discordgo.RESTError) *ErrBotHasNoPermissions
 	}
 
 	return r
+}
+
+func BotMissingPermission(missingPerm discordgo.PermissionOffset) *ErrBotHasNoPermissions {
+	return &ErrBotHasNoPermissions{Permission: missingPerm.String()}
 }
 
 func (r ErrBotHasNoPermissions) Error() string {
