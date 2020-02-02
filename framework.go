@@ -11,13 +11,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/auttaja/dgframework/router"
 	"github.com/auttaja/dgframework/utils"
 	"github.com/auttaja/dgframework/x/discordrolemanager"
-	"github.com/auttaja/dstatecache-go"
-	nats "github.com/nats-io/nats.go"
-
-	"github.com/auttaja/dgframework/router"
 	"github.com/auttaja/discordgo"
+	"github.com/auttaja/dstatecache-go"
 	"github.com/bwmarrin/snowflake"
 	"github.com/casbin/casbin"
 	mongodbadapter "github.com/casbin/mongodb-adapter"
@@ -44,7 +42,6 @@ type BotBuilder struct {
 	useStatefulEmbeds bool
 	startBot          bool
 	casbinDBURL       string
-	natsURL           string
 	stateURL          string
 	loglevel          int
 }
@@ -108,12 +105,6 @@ func (b *BotBuilder) SetCasbinDBURL(URL string) *BotBuilder {
 	return b
 }
 
-// SetNATSURL sets the NATS URL to use for distributed communications
-func (b *BotBuilder) SetNATSURL(URL string) *BotBuilder {
-	b.natsURL = URL
-	return b
-}
-
 // SetStateURL sets the remote State URL
 func (b *BotBuilder) SetStateURL(URL string) *BotBuilder {
 	b.stateURL = URL
@@ -129,7 +120,7 @@ func (b *BotBuilder) SetLogLevel(level int) *BotBuilder {
 
 // Build will build the bot using the provided information in the BotBuilder
 func (b *BotBuilder) Build() (bot *Bot, err error) {
-	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession, b.casbinDBURL, b.natsURL, b.loglevel)
+	bot, err = NewBot(b.token, b.prefix, b.shardID, b.shardCount, b.dbSession, b.casbinDBURL, b.loglevel)
 	if err != nil {
 		return
 	}
@@ -180,23 +171,12 @@ func (b *BotBuilder) Build() (bot *Bot, err error) {
 }
 
 // NewBot returns a new Bot instance
-func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client, casbinMongoURL string, natsURL string, loglevel int) (*Bot, error) {
+func NewBot(token, prefix string, shardID, shardCount int, dbSession *mongo.Client, casbinMongoURL string, loglevel int) (*Bot, error) {
 	bot := new(Bot)
 
 	dg, err := discordgo.New(token)
 	if err != nil {
 		return nil, err
-	}
-
-	if natsURL != "" {
-		n, err := nats.Connect(natsURL)
-		if err != nil {
-			return nil, err
-		}
-
-		dg.NATS = n
-		dg.NatsMode = 1
-		dg.NatsQueueName = ""
 	}
 
 	dg.LogLevel = loglevel
